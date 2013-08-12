@@ -8,15 +8,15 @@ end
 
 class Sbcl < Formula
   homepage 'http://www.sbcl.org/'
-  url 'http://downloads.sourceforge.net/project/sbcl/sbcl/1.1.2/sbcl-1.1.2-source.tar.bz2'
-  sha1 'b562c67d689abf8e0dffcd42d11617062ab52633'
+  url 'http://downloads.sourceforge.net/project/sbcl/sbcl/1.1.9/sbcl-1.1.9-source.tar.bz2'
+  sha1 'a2a2e165429940ecd5cf1c3bc3068898c4b864ea'
 
   head 'git://sbcl.git.sourceforge.net/gitroot/sbcl/sbcl.git'
 
   bottle do
-    sha1 '0552baca3f757837734fa0ecefbf158bc530c5a1' => :mountainlion
-    sha1 '9ff8b77853a16f30c1770790f71ec1260b4bd776' => :lion
-    sha1 '520a3526f4c3565fe2b7f99cd3e944431c8932f8' => :snowleopard
+    sha1 '7e35a9310709d31b97bc58d9f044d95ef35efa21' => :mountain_lion
+    sha1 '86d524f4d2ba3ee9a642463c065f1db594913ee7' => :lion
+    sha1 '76a5b9f8b10b998f8294ece1d6181616489ff703' => :snow_leopard
   end
 
   fails_with :llvm do
@@ -59,7 +59,7 @@ class Sbcl < Formula
     # Remove non-ASCII values from environment as they cause build failures
     # More information: http://bugs.gentoo.org/show_bug.cgi?id=174702
     ENV.delete_if do |key, value|
-      value =~ /[\x80-\xff]/
+      value =~ /[\x80-\xff]/n
     end
 
     SbclBootstrapBinaries.new.brew do
@@ -76,5 +76,9 @@ class Sbcl < Formula
 
     ENV['INSTALL_ROOT'] = prefix
     system "sh install.sh"
+  end
+
+  test do
+    system "#{bin}/sbcl", "--version"
   end
 end

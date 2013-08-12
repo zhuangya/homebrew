@@ -2,22 +2,18 @@ require 'formula'
 
 class Libvirt < Formula
   homepage 'http://www.libvirt.org'
-  url 'http://libvirt.org/sources/stable_updates/libvirt-0.9.11.8.tar.gz'
-  sha256 '70166babeae021bb22b601fb638354b1074e87c227bdfe1c5b605b4dc79c1032'
-
-  # Latest (roughly) monthly release.
-  devel do
-    url 'http://libvirt.org/sources/libvirt-1.0.1.tar.gz'
-    sha256 '4a16c76c46ebc41a6514082b5d95b5d5a0868e7a8cc00ab2e6cc1a23ec6b5a3b'
-  end
+  url 'http://libvirt.org/sources/libvirt-1.1.1.tar.gz'
+  sha256 'dc6f1e1e15b9b190eaa706e76edabcfc94b239c012f5afc22b22357a4b3b22c2'
 
   option 'without-libvirtd', 'Build only the virsh client and development libraries'
 
-  depends_on "gnutls"
+  depends_on 'pkg-config' => :build
+  depends_on 'gnutls'
   depends_on 'libgcrypt'
-  depends_on "yajl"
+  depends_on 'yajl'
+  depends_on :python => :recommended
 
-  if MacOS.version == :leopard
+  if MacOS.version <= :leopard
     # Definitely needed on Leopard, but not on Snow Leopard.
     depends_on "readline"
     depends_on "libxml2"
@@ -42,7 +38,8 @@ class Libvirt < Formula
             "--with-yajl",
             "--without-qemu"]
 
-    args << "--without-libvirtd" if build.include? 'without-libvirtd'
+    args << "--without-libvirtd" if build.without? 'libvirtd'
+    args << "--without-python" if build.without? 'python'
 
     system "./configure", *args
 
@@ -62,6 +59,14 @@ class Libvirt < Formula
         s.gsub! "/etc/", "#{HOMEBREW_PREFIX}/etc/"
         s.gsub! "/var/", "#{HOMEBREW_PREFIX}/var/"
       end
+    end
+  end
+
+  test do
+    if build.with? 'python'
+      # Testing to import the mod because that is a .so file where linking
+      # can break.
+      system python, '-c', "import libvirtmod"
     end
   end
 end

@@ -1,21 +1,13 @@
 require 'formula'
 
-class CpioDownloadStrategy < CurlDownloadStrategy
-  def stage
-    system "gzcat #{@tarball_path} | cpio -id"
-    chdir
-  end
-end
-
 class Mksh < Formula
-  homepage 'https://www.mirbsd.org/mksh.htm'
-  url 'https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R40d.cpio.gz',
-      :using => CpioDownloadStrategy
-  version '0.40d'
-  sha1 '74450a1107664797e5fdbdeb444f18f82f0686ac'
+  homepage 'https://mirbsd.org/mksh.htm'
+  url 'https://mirbsd.org/MirOS/dist/mir/mksh/mksh-R47.tgz'
+  version '45.1'
+  sha256 'b7159f09c551d97357b5b8a76829bfd6c668cc93f15faa92d510ad6dc0dab939'
 
   def install
-    system "sh", "./Build.sh", "-c", (ENV.compiler == :clang ? "lto" : "combine")
+    system "sh", "./Build.sh", "-r", "-c", (ENV.compiler == :clang ? "lto" : "combine")
     bin.install 'mksh'
     man1.install 'mksh.1'
   end

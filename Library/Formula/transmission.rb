@@ -2,22 +2,35 @@ require 'formula'
 
 class Transmission < Formula
   homepage 'http://www.transmissionbt.com/'
-  url 'http://download.transmissionbt.com/files/transmission-2.76.tar.bz2'
-  sha1 '410441da2eb11f5457d67b85e01492d68ce62c21'
+  url 'http://download.transmissionbt.com/files/transmission-2.81.tar.xz'
+  sha1 '2ca458982054b4ad21bdbdb8cf085c96e5118e34'
 
+  option 'with-nls', 'Build with native language support'
+
+  depends_on 'xz' => :build
   depends_on 'pkg-config' => :build # So it will find system libcurl
   depends_on 'libevent'
-  depends_on 'intltool' => :optional
-  depends_on 'gettext' => :optional # need gettext if intltool is used
+
+  if build.with? 'nls'
+    depends_on 'intltool' => :build
+    depends_on 'gettext'
+  end
 
   def install
-    args = ["--disable-dependency-tracking",
-            "--prefix=#{prefix}",
-            "--disable-mac",
-            "--without-gtk"]
+    ENV.append 'LDFLAGS', '-framework Foundation -prebind'
+    ENV.append 'LDFLAGS', '-liconv'
 
-    args << "--disable-nls" unless Formula.factory("intltool").installed? and
-                                   Formula.factory("gettext").installed?
+    args = %W[--disable-dependency-tracking
+              --prefix=#{prefix}
+              --disable-mac
+              --without-gtk]
+
+    args << "--disable-nls" unless build.with? 'nls'
+
+    #fixes issue w/ webui files not being found #21151
+    #submitted upstream: https://trac.transmissionbt.com/ticket/5304
+    inreplace 'libtransmission/platform.c', 'SYS_DARWIN', 'BUILD_MAC_CLIENT'
+    inreplace 'libtransmission/utils.c', 'SYS_DARWIN', 'BUILD_MAC_CLIENT'
 
     system "./configure", *args
     system "make" # Make and install in one step fails

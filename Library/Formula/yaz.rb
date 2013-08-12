@@ -2,8 +2,8 @@ require 'formula'
 
 class Yaz < Formula
   homepage 'http://www.indexdata.com/yaz'
-  url 'http://ftp.indexdata.dk/pub/yaz/yaz-4.2.47.tar.gz'
-  sha1 '2c8abfcf317852b754197136e25b7ce21393e071'
+  url 'http://ftp.indexdata.dk/pub/yaz/yaz-4.2.63.tar.gz'
+  sha1 'b5086f5831ca7987d5e35dcb1fa8d3e45b19fdb1'
 
   depends_on 'pkg-config' => :build
 

@@ -1,50 +1,29 @@
 require 'formula'
 
-class JdkInstalled < Requirement
-  def message; <<-EOS.undent
-    A JDK is required.
-
-    You can get the official Oracle installers from:
-    http://www.oracle.com/technetwork/java/javase/downloads/index.html
-    EOS
-  end
-
-  def satisfied?
-    which 'javac'
-  end
-
-  def fatal?
-    true
-  end
-end
-
 class Avian < Formula
   homepage 'http://oss.readytalk.com/avian/'
-  url 'http://oss.readytalk.com/avian/avian-0.6.tar.bz2'
-  sha1 '763e1d99af624416aac60f0e222df938aaa3510b'
+  url 'http://oss.readytalk.com/avian/avian-0.7.tar.bz2'
+  sha1 '7650d937c111154cfdeff465e3a1be77b07e1b26'
 
   head 'https://github.com/ReadyTalk/avian.git'
 
-  depends_on JdkInstalled.new
+  depends_on :macos => :lion
 
   def install
     system 'make', 'JAVA_HOME=/Library/Java/Home'
-
     bin.install Dir['build/darwin-*/avian*']
     lib.install Dir['build/darwin-*/*.dylib'] + Dir['build/darwin-*/*.a']
   end
 
-  def test
-    mktemp do
-      (Pathname.pwd/'Test.java').write <<-EOS.undent
-        public class Test {
-          public static void main(String arg[]) {
-            System.out.print("OK");
-          }
+  test do
+    (testpath/'Test.java').write <<-EOS.undent
+      public class Test {
+        public static void main(String arg[]) {
+          System.out.print("OK");
         }
-      EOS
-      system 'javac', 'Test.java'
-      %x[avian Test] == 'OK'
-    end
+      }
+    EOS
+    system 'javac', 'Test.java'
+    assert_equal 'OK', `avian Test`.strip
   end
 end

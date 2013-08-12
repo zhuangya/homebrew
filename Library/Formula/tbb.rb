@@ -2,9 +2,13 @@ require 'formula'
 
 class Tbb < Formula
   homepage 'http://www.threadingbuildingblocks.org/'
-  url 'http://threadingbuildingblocks.org/sites/default/files/software_releases/source/tbb41_20121003oss_src.tgz'
-  sha1 '072333068fa278635582846eaaa22d51c0100e09'
-  version '4.1u1'
+  url 'http://threadingbuildingblocks.org/sites/default/files/software_releases/source/tbb41_20130613oss_src.tgz'
+  sha1 'b1322bd10c5b05a79f61edb236adc0513b4a1532'
+  version '4.1u4'
+
+  fails_with :clang do
+    cause "Undefined symbols for architecture x86_64: vtable for tbb::tbb_exception"
+  end
 
   def install
     # Intel sets varying O levels on each compile command.

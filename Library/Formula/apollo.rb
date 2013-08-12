@@ -16,9 +16,9 @@ end
 
 class Apollo < Formula
   homepage 'http://activemq.apache.org/apollo'
-  url "http://archive.apache.org/dist/activemq/activemq-apollo/1.4/apache-apollo-1.4-unix-distro.tar.gz"
-  version "1.4"
-  sha1 '777b9de3209f05af30d013d52c12f68f8391ab54'
+  url "http://archive.apache.org/dist/activemq/activemq-apollo/1.6/apache-apollo-1.6-unix-distro.tar.gz"
+  version "1.6"
+  sha1 'e3fdd8b1d7a41809237e42bd724a427552b67533'
 
   option "no-bdb", "Install without bdb store support"
   option "no-mqtt", "Install without MQTT protocol support"
@@ -67,8 +67,6 @@ class Apollo < Formula
         </array>
         <key>RunAtLoad</key>
         <true/>
-        <key>UserName</key>
-        <string>#{`whoami`.chomp}</string>
         <key>WorkingDirectory</key>
         <string>#{var}/apollo</string>
       </dict>

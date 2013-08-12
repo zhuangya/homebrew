@@ -1,6 +1,8 @@
 require 'formula'
 
 class NoBdb5 < Requirement
+  satisfy(:build_env => false) { !Formula.factory("berkeley-db").installed? }
+
   def message; <<-EOS.undent
     This software can fail to compile when Berkeley-DB 5.x is installed.
     You may need to try:
@@ -9,29 +11,30 @@ class NoBdb5 < Requirement
       brew link berkeley-db
     EOS
   end
-
-  def satisfied?
-    f = Formula.factory("berkeley-db")
-    not f.installed?
-  end
-
-  # Not fatal in case Squid starts working with a newer version of BDB.
-  def fatal?
-    false
-  end
 end
 
 class Squid < Formula
   homepage 'http://www.squid-cache.org/'
-  url 'http://www.squid-cache.org/Versions/v3/3.2/squid-3.2.5.tar.gz'
-  sha1 '17c6f03ca90b0918b847e9e34669ba827da7edba'
+  url 'http://www.squid-cache.org/Versions/v3/3.3/squid-3.3.8.tar.gz'
+  sha1 '853b7619b65f91424f0d2c4089c095a67d79fc9b'
 
-  depends_on NoBdb5.new
+  depends_on NoBdb5
 
   def install
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--localstatedir=#{var}"
+    # For --disable-eui, see:
+    # http://squid-web-proxy-cache.1019090.n4.nabble.com/ERROR-ARP-MAC-EUI-operations-not-supported-on-this-operating-system-td4659335.html
+    args =%W[
+      --disable-debug
+      --disable-dependency-tracking
+      --prefix=#{prefix}
+      --localstatedir=#{var}
+      --enable-ssl
+      --enable-ssl-crtd
+      --disable-eui
+      --enable-ipfw-transparent
+    ]
+
+    system "./configure", *args
     system "make install"
   end
 
@@ -49,12 +52,9 @@ class Squid < Formula
         <string>#{opt_prefix}/sbin/squid</string>
         <string>-N</string>
         <string>-d 1</string>
-        <string>-D</string>
       </array>
       <key>RunAtLoad</key>
       <true/>
-      <key>UserName</key>
-      <string>#{`whoami`.chomp}</string>
       <key>WorkingDirectory</key>
       <string>#{var}</string>
     </dict>

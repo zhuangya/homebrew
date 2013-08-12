@@ -2,8 +2,8 @@ require 'formula'
 
 class Mosquitto < Formula
   homepage 'http://mosquitto.org/'
-  url 'http://mosquitto.org/files/source/mosquitto-1.1.tar.gz'
-  sha1 '3ad46a66790c90696c0a2f40b45fed02305e6f96'
+  url 'http://mosquitto.org/files/source/mosquitto-1.2.tar.gz'
+  sha1 'eb374899637310cfc785c661ec22117df496d949'
 
   depends_on 'pkg-config' => :build
   depends_on 'cmake' => :build
@@ -11,11 +11,6 @@ class Mosquitto < Formula
   depends_on 'openssl'
 
   def install
-    openssl = Formula.factory('openssl')
-
-    # specify brew-supplied OpenSSL libraries and includes
-    inreplace "CMakeLists.txt", "set (OPENSSL_INCLUDE_DIR \"\")", "set (OPENSSL_INCLUDE_DIR \"#{openssl.include}\")\nset (OPENSSL_LIBRARIES \"#{openssl.lib}\")"
-
     system "cmake", ".", *std_cmake_args
     system "make install"
 
@@ -23,12 +18,12 @@ class Mosquitto < Formula
     (var+'mosquitto').mkpath
   end
 
-  def test
-    system "#{sbin}/mosquitto -h > /dev/null ; [ $? -eq 3 ]"
+  test do
+    quiet_system "#{sbin}/mosquitto", "-h"
+    $?.exitstatus == 3
   end
 
-  def caveats
-    return <<-EOD.undent
+  def caveats; <<-EOD.undent
     mosquitto has been installed with a default configuration file.
         You can make changes to the configuration by editing
         #{etc}/mosquitto/mosquitto.conf
@@ -60,8 +55,6 @@ class Mosquitto < Formula
       <true/>
       <key>KeepAlive</key>
       <false/>
-      <key>UserName</key>
-      <string>#{`whoami`.chomp}</string>
       <key>WorkingDirectory</key>
       <string>#{var}/mosquitto</string>
     </dict>
